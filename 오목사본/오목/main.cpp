@@ -46,7 +46,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 
-	HDC hdc; // HDC 선언
+	HDC hdc, hdc2; // HDC 선언
 	PAINTSTRUCT ps;//페인트스트럭트 포인터 선언
 	static int x, y;
 	static omok *OMOK;
@@ -64,6 +64,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0); // 종료
 		return 0;
 
+	/*case WM_MOUSEMOVE:
+		hdc2 = GetDC(hWnd);
+		x = LOWORD(lParam); //x좌표
+		y = HIWORD(lParam); //y좌표
+		if (x > (OMOK->get_Row(0) - STONE_INTERVAL) && y > (OMOK->get_Col(0) - STONE_INTERVAL) && x < (OMOK->get_Row(ROW - 1) + STONE_INTERVAL) && y < (OMOK->get_Col(COL - 1) + STONE_INTERVAL))
+		{
+			x = (x - OMOK->get_Row(0) + STONE_INTERVAL) / FIELD_INTERVAL;
+			y = (y - OMOK->get_Col(0) + STONE_INTERVAL) / FIELD_INTERVAL;
+			if (OMOK->get_State(x, y) == 0) //돌이 놓여있지 않다면
+			{
+				Rectangle(hdc2, OMOK->get_Row(x) - 3, OMOK->get_Col(y) - 3, OMOK->get_Row(x) + 3, OMOK->get_Col(y) + 3);
+			}
+		}
+		ReleaseDC(hWnd, hdc2);
+		break;*/
+
 	case WM_LBUTTONDOWN:
 		x = LOWORD(lParam); //x좌표
 		y = HIWORD(lParam); //y좌표
@@ -71,11 +87,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		{
 			x = (x - OMOK->get_Row(0) + STONE_INTERVAL) / FIELD_INTERVAL;
 			y = (y - OMOK->get_Col(0) + STONE_INTERVAL) / FIELD_INTERVAL;
-			if (OMOK->get_State(x,y) == 0) //돌이 놓여있지 않다면
+			if (OMOK->get_State(x, y) == 0) //돌이 놓여있지 않다면
 			{
 				if (OMOK->next())
 					OMOK->get_down_Black(x, y); //흑돌 차례일때 흑돌 착수
-				else 
+				else
 					OMOK->get_down_White(x, y); //백돌 차례일때 백돌 착수
 
 				OMOK->swap(); //흑,백 순서 바꾸기
@@ -108,7 +124,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		SelectObject(hdc, oldBrush); //old브러쉬(기존브러쉬)를 선택함
 		DeleteObject(hBrush); //hBrush를 삭제
 
-		for(int i=0;i<ROW;i++)
+		for (int i = 0; i < ROW; i++)
 		{
 			MoveToEx(hdc, OMOK->get_Row(0), OMOK->get_Col(i), NULL);
 			LineTo(hdc, OMOK->get_Row(ROW - 1), OMOK->get_Col(i));
@@ -135,21 +151,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		Ellipse(hdc, OMOK->get_Row(15) - FLOWER_SPOT, OMOK->get_Col(15) - FLOWER_SPOT, OMOK->get_Row(15) + FLOWER_SPOT, OMOK->get_Col(15) + FLOWER_SPOT);
 		//화점
 
-		for (int i = 0; i < ROW; i++) 
-			for (int j = 0; j < COL; j++) 
-				if (OMOK->get_State(i,j) > 0) // 바둑돌이 놓여져 있는 경우 (1:흑돌, 2:흰돌) 
-				{  
+		for (int i = 0; i < ROW; i++)
+		{
+			for (int j = 0; j < COL; j++)
+			{
+				if (OMOK->get_State(i, j) > 0) // 바둑돌이 놓여져 있는 경우 (1:흑돌, 2:흰돌) 
+				{
 					if (OMOK->get_State(i, j) == 1)
-					{
 						SelectObject(hdc, bBrush); //흑돌
-						Ellipse(hdc, OMOK->get_Row(x) - STONE_INTERVAL, OMOK->get_Col(y) - STONE_INTERVAL, OMOK->get_Row(x) + STONE_INTERVAL, OMOK->get_Col(y) + STONE_INTERVAL);
-					}
-					else if (OMOK->get_State(i, j) == 2)
-					{
+					else
 						SelectObject(hdc, wBrush); //흰돌
-						Ellipse(hdc, OMOK->get_Row(x) - STONE_INTERVAL, OMOK->get_Col(y) - STONE_INTERVAL, OMOK->get_Row(x) + STONE_INTERVAL, OMOK->get_Col(y) + STONE_INTERVAL);
-					}
+
+					Ellipse(hdc, OMOK->get_Row(i) - STONE_INTERVAL, OMOK->get_Col(j) - STONE_INTERVAL, OMOK->get_Row(i) + STONE_INTERVAL, OMOK->get_Col(j) + STONE_INTERVAL);
 				}
+			}
+		}
 
 		//***************************************************************************
 		tmpDC = hdc;
