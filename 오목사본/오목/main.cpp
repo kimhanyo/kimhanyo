@@ -142,12 +142,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					if (OMOK->get_State(i, j) == 1)
 					{
 						SelectObject(hdc, bBrush); //Èæµ¹
-						Ellipse(hdc, OMOK->get_Row(x) - STONE_INTERVAL, OMOK->get_Col(y) - STONE_INTERVAL, OMOK->get_Row(x) + STONE_INTERVAL, OMOK->get_Col(y) + STONE_INTERVAL);
+						Ellipse(hdc, OMOK->get_Row(i) - STONE_INTERVAL, OMOK->get_Col(j) - STONE_INTERVAL, OMOK->get_Row(i) + STONE_INTERVAL, OMOK->get_Col(j) + STONE_INTERVAL);
 					}
 					else if (OMOK->get_State(i, j) == 2)
 					{
 						SelectObject(hdc, wBrush); //Èòµ¹
-						Ellipse(hdc, OMOK->get_Row(x) - STONE_INTERVAL, OMOK->get_Col(y) - STONE_INTERVAL, OMOK->get_Row(x) + STONE_INTERVAL, OMOK->get_Col(y) + STONE_INTERVAL);
+						Ellipse(hdc, OMOK->get_Row(i) - STONE_INTERVAL, OMOK->get_Col(j) - STONE_INTERVAL, OMOK->get_Row(i) + STONE_INTERVAL, OMOK->get_Col(j) + STONE_INTERVAL);
 					}
 				}
 
