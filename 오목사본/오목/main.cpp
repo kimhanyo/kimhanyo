@@ -85,7 +85,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_PAINT: // 그리기
-		hdc = BeginPaint(hWnd, &ps); //dc핸들 선언
+		static HDC MemDC, tmpDC;
+		static HBITMAP BackBit, oldBackBit;
+		static RECT bufferRT;
+		hdc = BeginPaint(hWnd, &ps);
+
+		//******************************************************************************
+		GetClientRect(hWnd, &bufferRT);
+		MemDC = CreateCompatibleDC(hdc);
+		BackBit = CreateCompatibleBitmap(hdc, bufferRT.right, bufferRT.bottom);
+		oldBackBit = (HBITMAP)SelectObject(MemDC, BackBit);
+		PatBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, WHITENESS);
+		tmpDC = hdc;
+		hdc = MemDC;
+		MemDC = tmpDC;
+		//******************************************************************************
+		//↑더블 버퍼링 처리
+
 		hBrush = CreateSolidBrush(RGB(244, 176, 77));
 		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 		Rectangle(hdc, OMOK->get_Row(0) - FIELD_INTERVAL, OMOK->get_Col(0) - FIELD_INTERVAL, OMOK->get_Row(ROW - 1) + FIELD_INTERVAL, OMOK->get_Col(COL - 1) + FIELD_INTERVAL);
@@ -118,28 +134,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		Ellipse(hdc, OMOK->get_Row(9) - FLOWER_SPOT, OMOK->get_Col(15) - FLOWER_SPOT, OMOK->get_Row(9) + FLOWER_SPOT, OMOK->get_Col(15) + FLOWER_SPOT);
 		Ellipse(hdc, OMOK->get_Row(15) - FLOWER_SPOT, OMOK->get_Col(15) - FLOWER_SPOT, OMOK->get_Row(15) + FLOWER_SPOT, OMOK->get_Col(15) + FLOWER_SPOT);
 		//화점
-		SelectObject(hdc, oldBrush); //old브러쉬(기존브러쉬)를 선택함
 
 		for (int i = 0; i < ROW; i++) 
-		{
 			for (int j = 0; j < COL; j++) 
-			{
 				if (OMOK->get_State(i,j) > 0) // 바둑돌이 놓여져 있는 경우 (1:흑돌, 2:흰돌) 
 				{  
 					if (OMOK->get_State(i, j) == 1)
+					{
 						SelectObject(hdc, bBrush); //흑돌
-					else 
+						Ellipse(hdc, OMOK->get_Row(x) - STONE_INTERVAL, OMOK->get_Col(y) - STONE_INTERVAL, OMOK->get_Row(x) + STONE_INTERVAL, OMOK->get_Col(y) + STONE_INTERVAL);
+					}
+					else if (OMOK->get_State(i, j) == 2)
+					{
 						SelectObject(hdc, wBrush); //흰돌
-
-					Ellipse(hdc, OMOK->get_Row(x) - STONE_INTERVAL, OMOK->get_Col(y) - STONE_INTERVAL, OMOK->get_Row(x) + STONE_INTERVAL, OMOK->get_Col(y) + STONE_INTERVAL);
+						Ellipse(hdc, OMOK->get_Row(x) - STONE_INTERVAL, OMOK->get_Col(y) - STONE_INTERVAL, OMOK->get_Row(x) + STONE_INTERVAL, OMOK->get_Col(y) + STONE_INTERVAL);
+					}
 				}
-			}
-		}
+
+		//***************************************************************************
+		tmpDC = hdc;
+		hdc = MemDC;
+		MemDC = tmpDC;
+		GetClientRect(hWnd, &bufferRT);
+		BitBlt(hdc, 0, 0, bufferRT.right, bufferRT.bottom, MemDC, 0, 0, SRCCOPY);
+		SelectObject(MemDC, oldBackBit);
+		DeleteObject(BackBit);
+		DeleteDC(MemDC);
+		//****************************************************************************
+		//↑더블 버퍼링 처리
 
 		SelectObject(hdc, oldBrush); //old브러쉬(기존브러쉬)를 선택함
 		DeleteObject(bBrush); //bBrush를 삭제
 		DeleteObject(wBrush); //wBrush를 삭제
-		EndPaint(hWnd, &ps);
+		EndPaint(hWnd, &ps); //페인트 종료
 		break;
 	}
 

@@ -13,7 +13,7 @@ class omok
 	int field_Col[COL] = { 0 }; 
 	//오목판의 줄 위치를 저장하는 배열
 
-	int stone[ROW][COL] = { 0 }; //바둑돌의 상태 정보 ( 0 : 안 둔 상태, 1 : 흑돌 존재, 2: 백돌 존재 )
+	int stone[ROW][COL]; //바둑돌의 상태 정보 ( 0 : 안 둔 상태, 1 : 흑돌 존재, 2: 백돌 존재 )
 	bool next_Stone = true; //흑백의 순서 true : 흑 flase : 백
 public:
 	omok();
@@ -21,9 +21,11 @@ public:
 	int get_Col(int col) { return field_Col[col]; }
 	int get_State(int row, int col) { return stone[row][col]; } //오목판의 상태(돌들의 상태) 리턴
 
-	void swap() { if (next_Stone == true)next_Stone = false; else next_Stone = true; } //흑백 교환
-	void get_down_Black(int row, int col) { stone[row][col] = 1; } //흑돌 착수
-	void get_down_White(int row, int col) { stone[row][col] = 2; } //백돌 착수
+	void swap(); //흑백 교환
+	void get_down_Black(int row, int col); //흑돌 착수
+	void get_down_White(int row, int col); //백돌 착수
 
-	bool next() { return next_Stone; }
+	bool next();
 };
+
+//int omok::stone[ROW][COL] = { 0 };
