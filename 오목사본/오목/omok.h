@@ -10,7 +10,7 @@
 class omok
 {
 	int field_Row[ROW] = { 0 };
-	int field_Col[COL] = { 0 }; 
+	int field_Col[COL] = { 0 };
 	//오목판의 줄 위치를 저장하는 배열
 
 	int stone[ROW][COL]; //바둑돌의 상태 정보 ( 0 : 안 둔 상태, 1 : 흑돌 존재, 2: 백돌 존재 )
@@ -26,6 +26,7 @@ public:
 	void get_down_White(int row, int col); //백돌 착수
 
 	bool next();
+	bool win_Check(int row, int col);
 };
 
 //int omok::stone[ROW][COL] = { 0 };

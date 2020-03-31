@@ -46,10 +46,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 
-	HDC hdc, hdc2; // HDC 선언
+	HDC hdc; // HDC 선언
 	PAINTSTRUCT ps;//페인트스트럭트 포인터 선언
 	static int x, y;
 	static omok *OMOK;
+	static bool win = false;
 	HBRUSH hBrush, oldBrush, bBrush, wBrush;
 	// 배경색으로 사용할 브러시를 생성한다. 
 
@@ -63,22 +64,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		delete OMOK;
 		PostQuitMessage(0); // 종료
 		return 0;
-
-	/*case WM_MOUSEMOVE:
-		hdc2 = GetDC(hWnd);
-		x = LOWORD(lParam); //x좌표
-		y = HIWORD(lParam); //y좌표
-		if (x > (OMOK->get_Row(0) - STONE_INTERVAL) && y > (OMOK->get_Col(0) - STONE_INTERVAL) && x < (OMOK->get_Row(ROW - 1) + STONE_INTERVAL) && y < (OMOK->get_Col(COL - 1) + STONE_INTERVAL))
-		{
-			x = (x - OMOK->get_Row(0) + STONE_INTERVAL) / FIELD_INTERVAL;
-			y = (y - OMOK->get_Col(0) + STONE_INTERVAL) / FIELD_INTERVAL;
-			if (OMOK->get_State(x, y) == 0) //돌이 놓여있지 않다면
-			{
-				Rectangle(hdc2, OMOK->get_Row(x) - 3, OMOK->get_Col(y) - 3, OMOK->get_Row(x) + 3, OMOK->get_Col(y) + 3);
-			}
-		}
-		ReleaseDC(hWnd, hdc2);
-		break;*/
 
 	case WM_LBUTTONDOWN:
 		x = LOWORD(lParam); //x좌표
@@ -94,6 +79,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 				else
 					OMOK->get_down_White(x, y); //백돌 차례일때 백돌 착수
 
+				if (OMOK->win_Check(x, y))
+					win = true;
+				
 				OMOK->swap(); //흑,백 순서 바꾸기
 			}
 		}
@@ -167,6 +155,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
+		if (win && OMOK->get_State(x, y) == 1) //흑돌이 승리시
+		{
+				if (MessageBox(hWnd, TEXT("흑 승리!!"), TEXT("흑돌이 이겼습니다!"), MB_OK) == IDOK)
+				{
+					delete OMOK;
+					PostQuitMessage(0); // 종료
+				}
+		}
+
+		if (win && OMOK->get_State(x, y) == 2) //백돌이 승리시
+		{
+				if (MessageBox(hWnd, TEXT("백 승리!!"), TEXT("백돌이 이겼습니다!"), MB_OK) == IDOK)
+				{
+					delete OMOK;
+					PostQuitMessage(0); // 종료
+				}
+		}
 		//***************************************************************************
 		tmpDC = hdc;
 		hdc = MemDC;
